@@ -113,7 +113,10 @@ function writeRecord(data) {
   if (lastRow > 1) {
     var dates = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
     for (var i = 0; i < dates.length; i++) {
-      if (dates[i][0] === targetDate) {
+      var cellDate = (dates[i][0] instanceof Date)
+        ? Utilities.formatDate(dates[i][0], Session.getScriptTimeZone(), 'yyyy-MM-dd')
+        : dates[i][0].toString();
+      if (cellDate === targetDate) {
         existingRow = i + 2; // 1-indexed + ヘッダー行
         break;
       }
@@ -154,11 +157,21 @@ function readRecords(days) {
   for (var i = 0; i < rawData.length; i++) {
     var row = rawData[i];
     if (!row[0]) continue; // 日付が空の行はスキップ
-    var dateStr = row[0].toString();
+    var dateStr = (row[0] instanceof Date)
+      ? Utilities.formatDate(row[0], Session.getScriptTimeZone(), 'yyyy-MM-dd')
+      : row[0].toString();
     if (dateStr >= cutoffStr) {
       var record = {};
       for (var j = 0; j < HEADERS.length; j++) {
-        record[HEADERS[j]] = row[j];
+        var key = HEADERS[j];
+        var val = row[j];
+        // SpreadsheetのDateオブジェクトを文字列に変換
+        if (key === 'date' && val instanceof Date) {
+          val = Utilities.formatDate(val, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+        } else if (key === 'timestamp' && val instanceof Date) {
+          val = val.toISOString();
+        }
+        record[key] = val;
       }
       records.push(record);
     }

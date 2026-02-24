@@ -67,7 +67,7 @@ export function QuadrantChart({ records }: Props) {
             cursor={{ strokeDasharray: '3 3' }}
             contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8 }}
             labelStyle={{ color: '#94a3b8' }}
-            formatter={(value, name) => [value, name === 'x' ? '方向性' : 'エネルギー']}
+            formatter={(value, name) => [value, name]}
           />
           <ReferenceLine x={3} stroke="#475569" strokeDasharray="4 4" />
           <ReferenceLine y={3} stroke="#475569" strokeDasharray="4 4" />

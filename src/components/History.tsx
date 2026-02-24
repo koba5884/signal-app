@@ -10,6 +10,25 @@ type Props = {
 
 const OPTION_LABELS = ['C', 'B', 'A'];
 
+function formatDate(dateStr: string): string {
+  // "2026-02-24T15:00:00.000Z" や "2026-02-24" を "2026/02/24" に整形
+  return dateStr.slice(0, 10).replace(/-/g, '/');
+}
+
+function formatTimestamp(ts: string): string {
+  if (!ts) return '';
+  try {
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return ts;
+    return d.toLocaleString('ja-JP', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit',
+    });
+  } catch {
+    return ts;
+  }
+}
+
 export function History({ records, loading }: Props) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
@@ -34,7 +53,12 @@ export function History({ records, loading }: Props) {
         <div className="px-4 mb-4">
           <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-slate-200 font-medium">{selectedRecord.date}</p>
+              <div>
+                <p className="text-slate-200 font-medium">{formatDate(selectedRecord.date)}</p>
+                {selectedRecord.timestamp && (
+                  <p className="text-slate-400 text-xs mt-0.5">入力: {formatTimestamp(selectedRecord.timestamp)}</p>
+                )}
+              </div>
               <button
                 onClick={() => setSelectedDate(null)}
                 className="text-slate-400 text-xs hover:text-slate-200"
@@ -94,7 +118,7 @@ export function History({ records, loading }: Props) {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-200 text-sm font-medium">{record.date}</p>
+                  <p className="text-slate-200 text-sm font-medium">{formatDate(record.date)}</p>
                   <p className="text-slate-400 text-xs mt-0.5">
                     E:{energy} D:{direction}
                   </p>
